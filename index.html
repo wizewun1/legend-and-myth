@@ -20,6 +20,7 @@
             width: 100%;
             height: 100%;
             color: white;
+            padding: 5px;
         }
 
         .panel {
@@ -1192,6 +1193,59 @@
 
         </div>
 
+        <div id="pageDemo" style="display: none;">
+
+            <div class="layoutColumn" 
+             style="align-items: center;
+                    justify-content: center;">
+
+                <div class="panel">
+
+                    <div class="layoutColumn">
+        
+                        <div class="layoutColumn" 
+                            style="align-items: center; 
+                                    margin-bottom: 10px;
+                                    height: 35px;">
+        
+                            <p id="playerLocation">Beginner's Realm</p>
+                            <p id="playerFocus"></p>
+        
+                        </div>
+
+                        <div id="map" 
+                                class="container"
+                                style="font: 20px Courier New;
+                                    align-items: center;
+                                    justify-content: center;">
+
+                        </div>
+
+                    </div>
+        
+                </div>
+        
+                <div class="panel">
+        
+                    <div id="output" class="layoutColumn"
+                            style="width: 500px;
+                                height: 150px;
+                                padding-right: 5px;
+                                overflow-y: auto;">
+
+                        <p>
+                            Ominous voice: Greetings adventurer. Many have come and gone
+                            from this place, but now it is your time. Go and discover your destiny.
+                        </p>
+        
+                    </div>
+        
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
     <script>
@@ -1209,6 +1263,209 @@
             document.getElementById(page).style.display = "flex"
             lastPage = page
         }
+
+        let map = {size: 100, width: 10, height: 10}
+
+            mapCells = [
+
+                1,1,0,0,1,1,1,1,6,1,
+                1,6,0,0,1,1,1,1,1,1,
+                1,1,0,0,1,1,1,6,1,1,
+                1,1,0,0,1,1,1,1,1,1,
+                1,1,1,1,1,1,0,0,0,1,
+                1,1,1,1,0,2,0,0,0,1,
+                1,1,1,1,0,1,0,1,1,1,
+                1,1,5,1,0,1,0,1,4,1,
+                1,1,1,1,1,1,0,3,1,1,
+                1,1,0,0,0,0,0,1,1,1
+
+            ]
+
+            mapCoordinates = []
+            coordinateIndex = 0
+            playerCoordinate = {x: 0, y: 0}
+
+            tileNone = {value:"0", graphic:"   "}
+            tileEmpty = {value:"1", graphic:"[ ]"}
+            tilePlayer = {value:"2", graphic:"[@]"}
+            tileNPC = {value:"3", graphic:"[&]"}
+            tileBuilding = {value:"4", graphic:"[█]"}
+            tileEnemy = {value:"5", graphic:"[*]"}
+            tileObject = {value:"6", graphic:"[#]"}
+
+        function updateMap() {
+
+            let counter = -1
+            let x = 0
+            let y = 1
+            for (var i = 0; i < mapCells.length; i++) {
+
+                x += 1
+                counter += 1
+
+                if (counter == map['width']) {
+
+                    document.getElementById('map').innerHTML += "<br>"
+                    y += 1
+                    x = 1
+                    counter = 0
+                }
+
+                mapCoordinates.push({x, y})
+
+                if (mapCells[i] == tileNone['value']) {
+                    document.getElementById('map').innerHTML += tileNone['graphic']
+                }
+
+                else if (mapCells[i] == tileEmpty['value']) {
+                    document.getElementById('map').innerHTML += tileEmpty['graphic']
+                }
+
+                else if (mapCells[i] == tilePlayer['value']) {
+                    playerCoordinate = {x, y}
+                    coordinateIndex = mapCells.indexOf(mapCells[i])
+                    document.getElementById('map').innerHTML += tilePlayer['graphic']
+                }
+
+                else if (mapCells[i] == tileBuilding['value']) {
+                    document.getElementById('map').innerHTML += tileBuilding['graphic']
+                }
+
+                else if (mapCells[i] == tileNPC['value']) {
+                    document.getElementById('map').innerHTML += tileNPC['graphic']
+                }
+
+                else if (mapCells[i] == tileEnemy['value']) {
+                    document.getElementById('map').innerHTML += tileEnemy['graphic']
+                }
+
+                else if (mapCells[i] == tileObject['value']) {
+                    document.getElementById('map').innerHTML += tileObject['graphic']
+                }
+            }
+
+            console.log(coordinateIndex)
+                console.log(mapCoordinates[coordinateIndex])
+        }
+
+        function clearMap() {
+            document.getElementById('map').innerHTML = ""
+        }
+
+        let previousCell = 1
+
+        function changeFocus() {
+
+            let newEle
+
+            switch(previousCell) {
+
+                case 1:
+                    document.getElementById('playerFocus').innerHTML = ""
+                    break
+
+                case 3:
+                    document.getElementById('playerFocus').innerHTML = "NPC"
+                    newEle = document.createElement('p')
+                    newEle.innerHTML = "NPC says 'Howdy, adventurer.'"
+                    document.getElementById('output').appendChild(newEle)
+                    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight
+                    break
+
+                case 4:
+                    document.getElementById('playerFocus').innerHTML = "Building"
+                    newEle = document.createElement('p')
+                    newEle.innerHTML = "Looks like a town."
+                    document.getElementById('output').appendChild(newEle)
+                    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight 
+                    break
+
+                case 5:
+                    document.getElementById('playerFocus').innerHTML = "Enemy"
+                    newEle = document.createElement('p')
+                    newEle.innerHTML = "(monster snarls at you)"
+                    document.getElementById('output').appendChild(newEle)
+                    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight
+                    break
+
+                case 6:
+                    document.getElementById('playerFocus').innerHTML = "Object"
+                    newEle = document.createElement('p')
+                    newEle.innerHTML = "Looks like some thing."
+                    document.getElementById('output').appendChild(newEle)
+                    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight
+                    break
+            }
+        }
+
+        function moveUp() {
+            if (playerCoordinate['y'] >= 2 && mapCells[coordinateIndex - map['width']] != 0) {
+                playerCoordinate['y'] -= 1
+                mapCells[coordinateIndex] = previousCell
+                previousCell = mapCells[coordinateIndex - map['width']]
+                mapCells[coordinateIndex - map['width']] = 2
+                clearMap()
+                updateMap()
+                changeFocus()
+            }
+        }
+
+        function moveDown() {
+            if (playerCoordinate['y'] < map['height'] && mapCells[coordinateIndex + map['width']] != 0) {
+                playerCoordinate['y'] += 1
+                mapCells[coordinateIndex] = previousCell
+                previousCell = mapCells[coordinateIndex + map['width']]
+                mapCells[coordinateIndex + map['width']] = 2
+                clearMap()
+                updateMap()
+                changeFocus()
+            }
+        }
+
+        function moveRight() {
+            if (playerCoordinate['x'] < map['width'] && mapCells[coordinateIndex + 1] != 0) {
+                playerCoordinate['x'] += 1
+                mapCells[coordinateIndex] = previousCell
+                previousCell = mapCells[coordinateIndex + 1]
+                mapCells[coordinateIndex + 1] = 2
+                clearMap()
+                updateMap()
+                changeFocus()
+            }
+        }
+
+        function moveLeft() {
+            if (playerCoordinate['x'] >= 2 && mapCells[coordinateIndex - 1] != 0) {
+                playerCoordinate['x'] -= 1
+                mapCells[coordinateIndex] = previousCell
+                previousCell = mapCells[coordinateIndex - 1]
+                mapCells[coordinateIndex - 1] = 2
+                clearMap()
+                updateMap()
+                changeFocus()
+            }
+        }
+
+        document.addEventListener('keyup', function(event) {
+
+            if (event.keyCode == 38) {
+                moveUp()
+            }
+
+            else if (event.keyCode == 40) {
+                moveDown()
+            }
+
+            else if (event.keyCode == 39) {
+                moveRight()
+            }
+
+            else if (event.keyCode == 37) {
+                moveLeft()
+            }
+        })
+
+        updateMap()
     
     </script>
 
